@@ -1,0 +1,145 @@
+//排列组合算法实现--基于JS
+C n 2代码：
+
+/**
+ * 排列组合(C n 2)     从n个数中选出2个数的所有情况。
+ * @param self  第一位（两位数的第一位）
+ * @param arr   （C n 2）中的n。属于排列组合的基值。
+ * @param index  开始的位置
+ * @param total  所有的排列情况。数组
+ */
+var plzh = function plsz(self, arr, index, total) {
+    if (self == "") {
+        self = arr[index++];
+        plzh(self, arr, index, total);
+    } else if (index == arr.length) {
+        index = $.inArray(self, arr);
+        if (index == arr.length - 1) {
+            return;
+        } else {
+            plzh("", arr, ++index, total);
+        }
+    } else {
+        other = arr[index++];
+        total.push(self + other);
+        plzh(self, arr, index, total);
+    }
+}
+var total = [];
+plzh("", ['黑', '白', '红', '黄'], 0, total);
+console.log(total);
+由此推论出C n n代码：
+/**
+ *C n n
+ * @param _selfs    当前的组合[]
+ * @param _arr      所有组合的基值[]
+ * @param _indexs   当前的组合对应的基值的索引[]
+ * @param _total    排列组合结果
+ * @param _where    当前排列组合循环的位置
+ */
+function plzh(_selfs, _arr, _indexs, _total, _where) {
+    if (_selfs != null && tools.isNotNull(_arr) && _arr.length >= _selfs.length) {
+        if (_where < _selfs.length - 1) { //非末位
+            var index = _indexs[_where];
+            if (index == _arr.length) { //非末位末尾
+                --_where;
+                if (_where == -1) { //首位超出
+                    return;
+                } else {
+                    _indexs[_where] = _indexs[_where] + 1;
+                    for (var i = _where + 1; i < _selfs.length; i++) {
+                        _indexs[i] = _indexs[i - 1] + 1;
+                    }
+                    plzh(_selfs, _arr, _indexs, _total, _where);
+                }
+            } else {
+                _selfs[_where] = _arr[index];
+                plzh(_selfs, _arr, _indexs, _total, ++_where);
+            }
+        } else { //末位
+            var index = _indexs[_where];
+            if (index == _arr.length) {  //直接末位末尾
+                --_where;
+                if (_where == -1) { //末位超出即 单关
+                    return;
+                }
+                _indexs[_where] = _indexs[_where] + 1;
+                for (var i = _where + 1; i < _selfs.length; i++) {
+                    _indexs[i] = _indexs[i - 1] + 1;
+                }
+                plzh(_selfs, _arr, _indexs, _total, _where);
+            } else {
+                _selfs[_where] = _arr[index];
+                _total.push(copy.deepCoby(_selfs));
+                var _nextIndex = _indexs[_where] + 1;
+                if (_nextIndex < _arr.length) {
+                    _indexs[_where] = _nextIndex;
+                    plzh(_selfs, _arr, _indexs, _total, _where);
+                } else { //下一个末位末尾
+                    --_where;
+                    if (_where == -1) {
+                        return;
+                    }
+                    _indexs[_where] = _indexs[_where] + 1;
+                    for (var i = _where + 1; i < _selfs.length; i++) {
+                        _indexs[i] = _indexs[i - 1] + 1;
+                    }
+                    plzh(_selfs, _arr, _indexs, _total, _where);
+                }
+            }
+        }
+    }
+}
+
+
+var _selfs = new Array(3);
+var _arr = ['黑','白','黄','红','橙','蓝','绿','紫'];
+var _indexs = [0,1,2]; //初始排列组合为 黑白黄，即对应的_arr的索引下标为0,1,2
+var _where = 0;
+var _total = [];
+plzh(_selfs, _arr, _indexs, _total, _where);
+console.log(JSON.stringify(_total));
+
+
+附：deepCopy 是我的一个深度克隆复制的方法
+
+/**
+ * @param obj   要clone的对象
+ * @return      clone对象
+ */
+deepCoby: function (obj) {
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj)
+        return obj;
+    // Handle Date
+    if (obj instanceof Date) {
+        var copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        var copy = [];
+        for (var i = 0, len = obj.length; i < len; ++i) {
+            copy[i] = this.deepCoby(obj[i]);
+        }
+        return copy;
+    }
+    // Handle Object
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = this.deepCoby(obj[attr]);
+        }
+        return copy;
+    }
+    throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
+
+--------------------- 
+作者：_starking 
+来源：CSDN 
+原文：https://blog.csdn.net/qq_28205539/article/details/71809347 
+版权声明：本文为博主原创文章，转载请附上博文链接！
